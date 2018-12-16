@@ -3,8 +3,14 @@ import pygame as pg
 from body import Body
 
 class Snake():
+    # direcao do momentum 
+    _DIR_UP = [0, -1] # quando ta indo pra cima, o valor do x nao muda e o y diminiu
+    _DIR_DOWN = [0, 1]
+    _DIR_LEFT = [-1, 0]
+    _DIR_RIGHT = [1, 0]
+
     def __init__(self):
-        self.body = [Body()]
+        self.body = [Body(), Body(), Body()]
         self.body_sprites = pg.sprite.Group()
         self.body_sprites.add(self.body)
 
@@ -51,15 +57,20 @@ class Snake():
         if(head_rect.bottom > game_height):    # saiu por baixo
             head_rect.top = 0
 
-    # metodos pra mudar de direcao
+    """ metodos pra mudar de direcao """
+    # nao pode mudar a direcao de maneira que a nova direcao va ocasionar na morte (e.g. esta indo pra cima e muda pra baixo), mas isso pode ocorrer caso exista so a cabeca
     def go_up(self):
-        self.momentum = [0, -1]
+        if(self.momentum != Snake._DIR_DOWN or len(self.body) == 1):
+            self.momentum = Snake._DIR_UP
     def go_down(self):
-        self.momentum = [0, 1]
+        if(self.momentum != Snake._DIR_UP or len(self.body) == 1):
+            self.momentum = Snake._DIR_DOWN
     def go_left(self):
-        self.momentum = [-1, 0]
+        if(self.momentum != Snake._DIR_RIGHT or len(self.body) == 1):
+            self.momentum = Snake._DIR_LEFT
     def go_right(self):
-        self.momentum = [1, 0]
+        if(self.momentum != Snake._DIR_LEFT or len(self.body) == 1):
+            self.momentum = Snake._DIR_RIGHT
     
     # crescer
     def grow(self):
@@ -76,13 +87,13 @@ class Snake():
 
     # desenha na tela
     def draw(self, screen):
-        for i, b in enumerate(self.body):
+        for i, body in enumerate(self.body):
+            # head
             if(i == 0):
-                b.image.fill([255, 0, 0])
-            elif(i%2):
-                b.image.fill([0, 0, 255])
+                body.image = Body._IMG_HEAD
+                # body.image.fill([255, 0, 0])
             else:
-                b.image.fill([0, 255, 0])
+                body.image.fill([0, 255, 0])
         self.body_sprites.draw(screen)
 
         
