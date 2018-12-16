@@ -2,8 +2,9 @@ import pygame as pg
 import sys
 
 from snake import Snake
+from food import Food
 
-# cores
+# cores basicas
 black = [0, 0, 0]
 white = [255, 255, 255]
 gray = [128, 128, 128]
@@ -11,9 +12,17 @@ red = [255, 0, 0]
 green = [0, 255, 0]
 blue = [0, 0, 255]
 
+# cores especiais
+light_green = [126, 200, 126]
+light_gray = [136, 140, 141]
+
+# cores na tela
+BACKGROUND_COLOR = light_gray
+
 # configuracao da tela
 HEIGHT = 300
 WIDTH = 300
+GAME_FPS = 12
 
 def main():
     # inits
@@ -23,11 +32,18 @@ def main():
     screen = pg.display.set_mode([WIDTH, HEIGHT])
     pg.display.set_caption("Cobrinha 2")
 
-    # clock
+    # clock pra controlar o FPS
     clock = pg.time.Clock()
 
     # cria a cobrinha
     snake = Snake()
+
+    # cria primeira comida
+    food = Food(WIDTH, HEIGHT)
+
+    # sprite pras comidas
+    food_sprites = pg.sprite.Group()
+    food_sprites.add(food)
 
     # game loop
     while True:
@@ -42,29 +58,42 @@ def main():
                 key = event.key
                 if(key == pg.K_UP):
                     snake.go_up()
-                if(key == pg.K_DOWN):
+                elif(key == pg.K_DOWN):
                     snake.go_down()
-                if(key == pg.K_LEFT):
+                elif(key == pg.K_LEFT):
                     snake.go_left()
-                if(key == pg.K_RIGHT):
+                elif(key == pg.K_RIGHT):
                     snake.go_right()
-                if(key == pg.K_SPACE):
+                elif(key == pg.K_SPACE):
                     snake.grow()
-        
+
+                # um movimento por frame
+                break
+            
+        # verifica se a comida foi comida
+        if(food.rect.center == snake.body[0].rect.center):
+            snake.grow()
+            food_sprites.remove(food)
+            food = Food(WIDTH, HEIGHT)
+            food_sprites.add(food)
+
+        # atualiza a comida
+        food_sprites.update()
         # atualiza a cobrinha (movimento)
         snake.update()
         # tenha certeza q nao saia da tela
         snake.assert_screen(WIDTH, HEIGHT)
 
         # desenhando cada frame
-        screen.fill(black)
+        screen.fill(BACKGROUND_COLOR)
+        food_sprites.draw(screen)
         snake.draw(screen)
 
         # atualizando a tela
         pg.display.flip()
 
         # ajuste do FPS
-        clock.tick(10)
+        clock.tick(GAME_FPS)
 
 if(__name__ == "__main__"):
     main()
