@@ -45,8 +45,9 @@ def main():
     food_sprites = pg.sprite.Group()
     food_sprites.add(food)
 
+    alive = True
     # game loop
-    while True:
+    while alive:
         for event in pg.event.get():
             # sair do jogo
             if(event.type == pg.QUIT):
@@ -81,8 +82,11 @@ def main():
         food_sprites.update()
         # atualiza a cobrinha (movimento)
         snake.update()
-        # tenha certeza q nao saia da tela
-        snake.assert_screen(WIDTH, HEIGHT)
+
+        # (!!DEPRECATED!!) snake.assert_screen(WIDTH, HEIGHT) SE FOR USAR ESSE METODO TEMQ ESTAR ANTES DOS UPDATES
+        alive = snake.out_of_screen(WIDTH, HEIGHT) and snake.check_collision()
+        # sem esse if-statement a cabeca sai da tela antes de morrer... como posso remove-lo??
+        if(not alive): break
 
         # desenhando cada frame
         screen.fill(BACKGROUND_COLOR)
